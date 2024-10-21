@@ -1,0 +1,40 @@
+train: D:\lx\yolov5-master\VOCDATA\dataSet_path\train.txt
+val: D:\lx\yolov5-master\VOCDATA\dataSet_path\val.txt
+nc: 2  # number of classes
+depth_multiple: 0.33  # model depth multiple
+width_multiple: 0.50  # layer channel multiple
+#anchors:
+#  - [10, 13, 16, 30, 33, 23]  # P3/8
+#  - [30, 61, 62, 45, 59, 119]  # P4/16
+#  - [116, 90, 156, 198, 373, 326]  # P5/32
+#backbone:
+#  - [-1, 1, Conv, [64, 6, 2, 2]]  # Convolution layer
+#  - [-1, 1, Conv, [128, 3, 2]]  # Convolution layer
+#  - [-1, 3, C3, [128]]  # CSPDarknet block
+#  - [-1, 1, Conv, [256, 3, 2]]  # Convolution layer
+#  - [-1, 6, C3, [256]]  # CSPDarknet block
+#  - [-1, 1, Conv, [512, 3, 2]]  # Convolution layer
+#  - [-1, 9, C3, [512]]  # CSPDarknet block
+#  - [-1, 1, Conv, [1024, 3, 2]]  # Convolution layer
+#  - [-1, 3, C3, [1024]]  # CSPDarknet block
+#  - [-1, 1, SPPF, [1024, 5]]  # Spatial Pyramid Pooling - Fast layer
+#head:
+#  - [-1, 1, Conv, [512, 1, 1]]  # Convolution layer
+#  - [-1, 1, Upsample, [None, 2, 'nearest']]  # Upsampling layer
+#  - [[-1, 6], 1, Concat, [1]]  # Concatenation layer
+#  - [-1, 3, C3, [512, False]]  # CSPDarknet block
+#  - [-1, 1, Conv, [256, 1, 1]]  # Convolution layer
+#  - [-1, 1, Upsample, [None, 2, 'nearest']]  # Upsampling layer
+#  - [[-1, 4], 1, Concat, [1]]  # Concatenation layer
+#  - [-1, 3, C3, [256, False]]  # CSPDarknet block
+#  - [-1, 1, Conv, [256, 3, 2]]  # Convolution layer
+#  - [[-1, 14], 1, Concat, [1]]  # Concatenation layer
+#  - [-1, 3, C3, [512, False]]  # CSPDarknet block
+#  - [-1, 1, Conv, [512, 3, 2]]  # Convolution layer
+#  - [[-1, 10], 1, Concat, [1]]  # Concatenation layer
+#  - [-1, 3, C3, [1024, False]]  # CSPDarknet block
+#  - [[17, 20, 23], 1, Detect, ['nc', 'anchors']]  # Detection layer
+
+names:
+  0: people
+  1: car

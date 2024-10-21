@@ -1,0 +1,91 @@
+import cv2
+import numpy as np
+import torch
+from PIL import Image
+from ultralytics.utils.plotting import save_one_box  # 假设save_one_box位于此模块中
+from pathlib import Path
+
+
+def load_model(model_path):
+    # 加载模型权重
+    model = torch.hub.load('ultralytics/yolov5', 'custom', path=model_path, force_reload=True)
+    model.eval()  # 设置模型为评估模式
+    return model
+
+
+def draw_boxes_and_calculate_dimensions(image, model, save_crops=True):
+    # 将 OpenCV 图像转换为 PIL 图像
+    pil_image = Image.fromarray(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+
+    # 使用模型进行推理
+    results = model(pil_image, size=640)  # 设置图像大小
+
+    # 获取检测结果
+    predictions = results.xyxy[0].tolist()
+
+    # 创建一个新的图像绘图对象
+    image_copy = image.copy()
+
+    # 遍历每一个检测结果
+    for idx, pred in enumerate(predictions):
+        # pred 格式为 [x1, y1, x2, y2, confidence, class_id]
+        x1, y1, x2, y2 = int(pred[0]), int(pred[1]), int(pred[2]), int(pred[3])
+        confidence = pred[4]
+        class_id = int(pred[5])
+
+        # 在帧上绘制边界框
+        cv2.rectangle(image_copy, (x1, y1), (x2, y2), (0, 255, 0), 2)
+
+        # 计算边界框的宽度和高度
+        width = x2 - x1
+        height = y2 - y1
+
+        # 构造标签字符串
+        label = (
+            f"Class ID: {class_id}, Confidence: {confidence:.2f}, "
+            f"Coordinates: (x1, y1, x2, y2) = ({x1}, {y1}, {x2}, {y2}), "
+            f"Width: {width} pixels, Height: {height} pixels"
+        )
+
+        # 在边界框上方写入类别ID、置信度、坐标、宽度和高度
+        text_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.5, 2)[0]
+        text_x = max(x1, image.shape[1] - text_size[0] - 10)
+        text_y = max(y1 - 10, text_size[1] + 10)
+
+        # 绘制背景矩形以提高可读性
+        cv2.rectangle(image_copy, (text_x, text_y - text_size[1]), (text_x + text_size[0], text_y), (0, 255, 0), -1)
+        cv2.putText(image_copy, label, (text_x, text_y), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+
+        # 打印坐标、置信度、宽度和高度
+        print(label)
+
+        # 保存裁剪的图像
+        if save_crops:
+            file_name = f'crop_{idx}.jpg'
+            cropped_img = save_one_box(torch.tensor([x1, y1, x2, y2]), np.array(pil_image), file=Path(file_name))
+
+    return image_copy
+
+
+# 加载预训练的YOLOv5模型
+model_path = r'D:\lx\yolov5-master\runs\train\exp16\weights\best.pt'
+model = load_model(model_path)
+
+# 指定图片路径
+image_path = r'D:\lx\yolov5-master\test_image.jpg'
+
+# 读取图片
+image = cv2.imread(image_path)
+
+if image is None:
+    print("无法打开图片")
+else:
+    # 进行物体检测并绘制边界框
+    annotated_image = draw_boxes_and_calculate_dimensions(image, model)
+
+    # 显示处理后的帧
+    cv2.imshow('Annotated Image', annotated_image)
+
+    # 等待按键关闭窗口
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
